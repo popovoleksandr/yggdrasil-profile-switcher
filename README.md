@@ -1,5 +1,5 @@
 # Yggdrasil Profile Switcher
-Profile switcher script for Yggdrasil Network
+Profile switcher script for Yggdrasil Network (https://yggdrasil-network.github.io/)
 
 ## Preparation
 ### Dependencies
