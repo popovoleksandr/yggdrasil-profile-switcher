@@ -1,0 +1,26 @@
+{
+  "ConfigFilePath": "/etc/yggdrasil.conf",
+  "Profiles": [
+    {
+      "name": "dev",
+      "peers": [
+        "tcp://1.2.3.4:1234",
+        "tcp://5.6.7.8:5678"
+      ]
+    },
+    {
+      "name": "test",
+      "peers": [
+        "tcp://2.3.4.5:1234",
+        "tcp://6.7.8.9:1234"
+      ]
+    },
+    {
+      "name": "prod",
+      "peers": [
+        "tcp://1.2.3.4:1234",
+        "tcp://6.7.8.9:1234"
+      ]
+    }
+  ]
+}
