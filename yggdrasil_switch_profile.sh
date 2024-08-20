@@ -36,23 +36,48 @@ fi
 cp "$CONFIG_FILE" "$CONFIG_FILE.bak"
 
 # Update the Peers section in the yggdrasil config file
-sudo sed -i.bak "/Peers: \[/,/]/c\\
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  sudo sed -i.bak "/Peers: \[/,/]/c\\
   Peers: [\\
     $PEERS\\
   ]
-" /etc/yggdrasil.conf
-
-# Restart the yggdrasil service
-sudo launchctl unload /Library/LaunchDaemons/yggdrasil.plist
-if [ $? -ne 0 ]; then
-  echo "Failed to unload the yggdrasil service"
-  exit 1
+  " "$CONFIG_FILE"
+else
+  # Linux
+  sudo sed -i "/Peers: \[/,/]/c\\
+  Peers: [\\
+    $PEERS\\
+  ]
+  " "$CONFIG_FILE"
 fi
 
-sudo launchctl load /Library/LaunchDaemons/yggdrasil.plist
-if [ $? -ne 0 ]; then
-  echo "Failed to load the yggdrasil service"
-  exit 1
+# Restart the yggdrasil service
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  sudo launchctl unload /Library/LaunchDaemons/yggdrasil.plist
+  if [ $? -ne 0 ]; then
+    echo "Failed to unload the yggdrasil service"
+    exit 1
+  fi
+
+  sudo launchctl load /Library/LaunchDaemons/yggdrasil.plist
+  if [ $? -ne 0 ]; then
+    echo "Failed to load the yggdrasil service"
+    exit 1
+  fi
+else
+  # Linux
+  if command -v systemctl >/dev/null; then
+    sudo systemctl restart yggdrasil
+    if [ $? -ne 0 ]; then
+      echo "Failed to restart the yggdrasil service"
+      exit 1
+    fi
+  else
+    echo "systemctl not found. Ensure you have systemd installed, or manually restart the yggdrasil service."
+    exit 1
+  fi
 fi
 
 echo "Switched to profile '$PROFILE_NAME' and restarted yggdrasil service."
