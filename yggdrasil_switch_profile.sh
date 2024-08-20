@@ -1,5 +1,40 @@
 #!/bin/bash
 
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Check if necessary commands are installed
+missing_packages=()
+for cmd in jq sed; do
+  if ! command_exists "$cmd"; then
+    missing_packages+=("$cmd")
+  fi
+done
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  if ! command_exists "launchctl"; then
+    missing_packages+=("launchctl (part of macOS, required to manage services)")
+  fi
+else
+  if ! command_exists "systemctl" && [ -f /etc/debian_version ]; then
+    missing_packages+=("systemctl (part of systemd, required to manage services on Linux)")
+  fi
+fi
+
+if ! command_exists "yggdrasil"; then
+  missing_packages+=("yggdrasil")
+fi
+
+if [ ${#missing_packages[@]} -ne 0 ]; then
+  echo "The following required packages are missing:"
+  for pkg in "${missing_packages[@]}"; do
+    echo "  - $pkg"
+  done
+  exit 1
+fi
+
 # Check if the configuration file path and profile name are provided
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Usage: $0 <config_file_path> <profile_name>"
@@ -68,7 +103,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   fi
 else
   # Linux
-  if command -v systemctl >/dev/null; then
+  if command_exists "systemctl"; then
     sudo systemctl restart yggdrasil
     if [ $? -ne 0 ]; then
       echo "Failed to restart the yggdrasil service"
