@@ -25,12 +25,16 @@ if (-not (CommandExists "yggdrasil")) {
 if ($missingPackages.Count -ne 0) {
     Write-Host "The following required packages are missing:"
     $missingPackages | ForEach-Object { Write-Host "  - $_" }
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 
 # Check if parameters are provided
 if ($args.Count -lt 2) {
     Write-Host "Usage: yggdrasil_switch_profile.ps1 <config_file_path> <profile_name>"
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 
