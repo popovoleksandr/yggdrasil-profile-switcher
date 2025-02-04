@@ -9,6 +9,11 @@ function CommandExists {
     param ($command)
     Get-Command $command -ErrorAction SilentlyContinue
 }
+# Function to prompt user to press any key before exiting
+function WaitForKeyPress {
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+}
 
 $missingPackages = @()
 
@@ -25,16 +30,14 @@ if (-not (CommandExists "yggdrasil")) {
 if ($missingPackages.Count -ne 0) {
     Write-Host "The following required packages are missing:"
     $missingPackages | ForEach-Object { Write-Host "  - $_" }
-    Write-Host "Press any key to exit..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    WaitForKeyPress
     exit 1
 }
 
 # Check if parameters are provided
 if ($args.Count -lt 2) {
     Write-Host "Usage: yggdrasil_switch_profile.ps1 <config_file_path> <profile_name>"
-    Write-Host "Press any key to exit..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    WaitForKeyPress
     exit 1
 }
 
@@ -44,8 +47,7 @@ $PROFILE_NAME = $args[1]
 # Check if main configuration JSON file exists
 if (-not (Test-Path $MAIN_CONFIG_FILE)) {
     Write-Host "Main config file '$MAIN_CONFIG_FILE' does not exist."
-    Write-Host "Press any key to exit..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    WaitForKeyPress
     exit 1
 }
 
@@ -54,8 +56,7 @@ $CONFIG_FILE = (Get-Content $MAIN_CONFIG_FILE | jq -r '.ConfigFilePath') + "\ygg
 
 if (-not (Test-Path $CONFIG_FILE)) {
     Write-Host "Config file '$CONFIG_FILE' does not exist."
-    Write-Host "Press any key to exit..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    WaitForKeyPress
     exit 1
 }
 
@@ -65,8 +66,7 @@ $PEERS = (Get-Content $MAIN_CONFIG_FILE | jq -r --arg PROFILE_NAME "$PROFILE_NAM
 
 if ([string]::IsNullOrWhiteSpace($PEERS)) {
     Write-Host "Profile '$PROFILE_NAME' not found in the config file."
-    Write-Host "Press any key to exit..."
-    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    WaitForKeyPress
     exit 1
 }
 
@@ -129,5 +129,4 @@ if ($service) {
 }
 
 # Prompt user to press any key before exiting
-Write-Host "Press any key to exit..."
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+WaitForKeyPress
