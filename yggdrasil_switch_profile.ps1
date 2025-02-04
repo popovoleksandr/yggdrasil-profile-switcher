@@ -1,9 +1,3 @@
-## Auto-elevate script to run as Administrator if not already elevated
-#if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-#    Start-Process powershell -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-#    exit
-#}
-
 # Check if required commands are available
 function CommandExists {
     param ($command)
@@ -43,6 +37,15 @@ if ($args.Count -lt 2) {
 
 $MAIN_CONFIG_FILE = $args[0]
 $PROFILE_NAME = $args[1]
+
+# Auto-elevate script to run as Administrator if not already elevated
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+    $fullConfigPath = Resolve-Path -Path $args[0] | Select-Object -ExpandProperty Path
+    $argList = "-ExecutionPolicy Bypass -NoProfile -File `"$PSCommandPath`" `"$fullConfigPath`" `"$PROFILE_NAME`""
+    Start-Process powershell -ArgumentList $argList -Verb RunAs -WorkingDirectory $scriptDir
+    exit
+}
 
 # Check if main configuration JSON file exists
 if (-not (Test-Path $MAIN_CONFIG_FILE)) {
