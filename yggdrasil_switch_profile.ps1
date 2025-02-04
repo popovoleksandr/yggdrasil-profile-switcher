@@ -40,6 +40,8 @@ $PROFILE_NAME = $args[1]
 # Check if main configuration JSON file exists
 if (-not (Test-Path $MAIN_CONFIG_FILE)) {
     Write-Host "Main config file '$MAIN_CONFIG_FILE' does not exist."
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 
@@ -48,6 +50,8 @@ $CONFIG_FILE = (Get-Content $MAIN_CONFIG_FILE | jq -r '.ConfigFilePath') + "\ygg
 
 if (-not (Test-Path $CONFIG_FILE)) {
     Write-Host "Config file '$CONFIG_FILE' does not exist."
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 
@@ -57,6 +61,8 @@ $PEERS = (Get-Content $MAIN_CONFIG_FILE | jq -r --arg PROFILE_NAME "$PROFILE_NAM
 
 if ([string]::IsNullOrWhiteSpace($PEERS)) {
     Write-Host "Profile '$PROFILE_NAME' not found in the config file."
+    Write-Host "Press any key to exit..."
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     exit 1
 }
 
@@ -117,3 +123,7 @@ if ($service) {
     Start-Process -FilePath "C:\Program Files\Yggdrasil\yggdrasil.exe" -ArgumentList "-useconfig C:\ProgramData\Yggdrasil\config.json" -NoNewWindow
     Write-Host "Yggdrasil restarted manually."
 }
+
+# Prompt user to press any key before exiting
+Write-Host "Press any key to exit..."
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
