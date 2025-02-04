@@ -36,7 +36,7 @@ Do not forget to modify `ConfigFilePath` since for different OSes it might be di
 sudo ./yggdrasil_switch_profile.sh ./config.json dev
 ```
 
-You need to run this from Administrator PowerShell:
+You need to run this from Administrator PowerShell or it will be auto-elevated by script:
 ```powershell
 powershell .\yggdrasil_switch_profile.ps1 .\config.json dev
 ```
